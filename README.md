@@ -1,1 +1,1 @@
-# Wojewodztwa_leaflet
+Wyświetlanie mapy województw z możliwością identyfikowania województwa oraz pozyskiwania współrzędnych geograficznych przesuwalnego markera.
