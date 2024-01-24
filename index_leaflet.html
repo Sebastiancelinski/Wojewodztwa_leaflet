@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Sebastian Celiński Województwa</title>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""></script>
+      <script src=".\Wojewodztwa.js"></script>
+   </head>
+   <body>
+      <div id = "map" style = "width: 1800px; height: 900px"></div>
+      <script>
+
+         
+         
+         //Podłączenie warstw orotofotomapy i cieniowania za pomocą serwera wms
+         var Cieniowanie = L.tileLayer.wms('https://mapy.geoportal.gov.pl/wss/service/PZGIK/NMT/GRID1/WMS/ShadedRelief', 
+		 {
+         layers: 'raster',
+         format: 'image/png',
+         transparent: true
+         });
+         var Ortofotomapa = L.tileLayer.wms('https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/StandardResolution', 
+		 {
+         layers: 'raster',
+         format: 'image/png',
+         transparent: true
+         });
+         
+         //Pozycja początkowa podglądu
+         var mapOptions = 
+		 {center: [53.7799500, 18.4941600],
+            zoom: 6};
+
+         //dodane mapy z konfiguracją początkowej lokalizacji	
+         var map = new L.map('map', mapOptions);
+
+         //dodawanie mapy województw na pomoca geojson
+         var Wojewodztwa = L.geoJSON(Wojewodztwa,
+		 {
+         onEachFeature: function (feature, layer) 
+		 {
+            layer.bindPopup('Wojewodztwo '+ feature.properties.nazwa) 
+         },
+	      style: {color: 'Blue',}
+	      });
+
+
+         // Dodawanie poszczególnych warstw
+         var layers = 
+		 {
+            "Cieniowanie": Cieniowanie,
+            "Ortofotomapa": Ortofotomapa,
+            "Państwowy Rejestr Granic - Wojwództwa": Wojewodztwa
+         };
+
+L.control.layers(null, layers).addTo(map);
+
+// Dodawanie skali
+L.control.scale
+(
+{ 
+   metric: true,
+   imperial: false,
+   maxWidth: 250
+}
+).addTo(map);
+//Dodawanie opcji markera
+var markerOptions = 
+{
+	title: "Lokalizacja",
+    clickable: true,
+    draggable: true
+};
+
+//Dodawanie markera o wyżej ustalonej konfiguracji
+var theMarker =L.marker([53.7799500, 18.4941600], markerOptions);
+map.on('click',function(e)
+{
+  lat = e.latlng.lat;
+  lon = e.latlng.lng;
+
+      if (map.hasLayer(theMarker)) 
+	  {
+    map.removeLayer(theMarker); // usuwanie markera
+	}
+
+   theMarker = L.marker([lat,lon]).addTo(map)
+   .bindPopup("Szerokość geograficzna:" + lat + " Długość geograficzna: "+lon).openPopup();  
+}
+
+
+);
+
+
+      </script>
+   </body>
+</html>
